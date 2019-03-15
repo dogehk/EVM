@@ -1,4 +1,7 @@
-## The Ethereum Virtual Machine
+# The Ethereum Virtual Machine
+해당 글은 Howard님이 2017/08/06 에 작성한 [Diving Into The Ethereum Virtual Machine] https://blog.qtum.org/diving-into-the-ethereum-vm-6e8d5d2f3c30 [Diving Into The Ethereum Virtual Machine] 을 번역한 글입니다. 변역 과정에서 자연스러운 문장을 위해 다소 변경한 부분이 존재할 수 있습니다. 
+
+## The Ethereum Virtual Machine - Part1
 
 Solidity는 고급 프로그래밍 언어로 많은 추상화를 제공한다. 그러나 이러한 추상화는 Solidity 관련 문서를 읽어봐도 프로그램이 동작하는 동안에 무슨일이 일어나는지 이해하기 어렵다. 예를 들면 아래와 같은 것들 말이다.
 
@@ -38,6 +41,7 @@ EVM bytecode가 어떻게 동작하는 지 이해하기 위해서 간단한 Soli
 ```
 
 최종 목표는 컴파일된 Solidity contract를 이해하는 것이다. 자! 기본적인 EVM bytecode를 읽는 것부터 시작하자! 참고로 EVM Instruction Set 테이블은 유용한 자료이다.
+
 
 ### A Simple Contract
 
@@ -106,6 +110,7 @@ Binary:
 
 참고로 `6060604052…` 는 EVM이 실질적으로 실행하는 bytecode 이다.
 
+
 ### In Baby Steps
 
 위에서 생성된 어셈블리 코드의 절반은 일반적인 Solidity 프로그램들에서 동일하게 사용되는 구문이다. 해당 구문은 나중에 살펴보고 지금은 아래의 코드와 같이 우리의 contract에 한정된 부분만 확인할 것이다. 
@@ -146,7 +151,8 @@ tag_2:
 
 어셈블리 코드에 있는 “0x01”은 push(0x01) 명령어를 위한 것이다. 이 명령어는 stack에 “1”을 push한다. 여전히 어렵지만 걱정하지 마라. EVM에서 어셈블리 코드를 한줄 한줄 시뮬레이팅 하는 것은 생각보다 간단하다.
 
-## Simulating The EVM
+
+### Simulating The EVM
 
 EVM은 stack machine 이다. 명령어들은 stack 에 있는 arguments 등과 같은 값을 사용하고, 그 결과들을 stack에 push 한다. “add”의 동작에 대해 생각해보자. 
 예를 들어 stack에 아래와 같은 두 개의 값이 있다. 
@@ -220,7 +226,8 @@ stack: []
 store: { 0x0 => 0x1 }
 ```
 
-## Two Storage Variables
+
+### Two Storage Variables
 
 위의 예제에서 동일한 타입의 Extra storage variable 하나를 추가해보자.
 
@@ -278,7 +285,8 @@ pseudocode 에서의 어셈블리 코드는 아래와 같다.
 
 여기서 우리는 아래와 같이 저장한 두 개의 변수(uint256 a, uint256 b)가 “0x0”, “0x1”에 각각 차례로 위치한다는 점을 알 수 있다.
 
-## Storage Packing
+
+### Storage Packing
 
 각 storage 슬롯은 32bytes를 저장할 수 있다. 만약 하나의 변수가 16bytes만 필요하더라도 32bytes 모두를 사용하기 때문에 storage가 낭비된다. Solidity는 이러한 낭비를 막고 storage를 효과적으로 사용하기 위해 가능하다면 하나의 stroage 슬롯에 두 개의 작은 데이터를 packing이라는 작업을 수행하여 최적화한다.
 
@@ -367,7 +375,8 @@ Packing을 하는 이유는 아래와 같이 storage 사용하는 작업은 gas�
 
 같은 storage position을 사용하기 위해, Solidity는 packing 작업을 통해 “uint128 b”를 저장하는데 있어 20000 gas 대신에 5000 gas를 지불하여, 15000 gas를 절약한다.
 
-## More Optimization
+
+### More Optimization
 
 a와 b를 저장하는 sstore 명령어를 두개로 분리하지 않고, 메모리에서 두 개의 128bits 값을 packing하고 하나의 sstore 명령어만을 사용하면 추가적으로 5000 gas를 절약할 수 있다. 이러한 작업은 아래와 같이 컴파일 시 optimize flag를 이용하여 Solidity가 최적화하도록 만들수 있다.
 
@@ -496,7 +505,8 @@ tag_2:
 
 마침내, 32bytes 값은 “0x0”에 저장되었다.
 
-## Gas Usage
+
+### Gas Usage
 
 60008054700**200000000000000000000000000000000**6001608060020a03199091166001176001608060020a0316179055
 
@@ -515,7 +525,8 @@ tag_2:
 
 결과적으로 zero-byte가 많은 긴 bytecode 의 gas 소모량이 적다.
 
-## Summary
+
+### Summary
 
 EVM 컴파일러는 bytecode 크기, 속도, 메모리를 효과적으로 사용하기 위한 최적화가 존재하지 않지만 gas 사용량을 최적화하며 이것은 Ehtereum 블록체인이 효율적으로 수행할 수 있는 계산을 인센티브로 하는 간접 계층이다. 
 
