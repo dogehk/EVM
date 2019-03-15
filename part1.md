@@ -9,19 +9,19 @@ Solidity는 고급 프로그래밍 언어로 많은 추상화를 제공한다. �
 
 ```
 1. String, bytes32, byte[ ], bytes의 차이점은 무엇인가?
-- 언제 어떤 것을 선택해서 사용해야하는 가?
-- string에서 bytes로 변환할 때 어떤 일이 발생하는 가? byte[ ]로 변환할 수 있는가?
-- 얼마나 많은 비용이 드는가?
+    - 언제 어떤 것을 선택해서 사용해야하는 가?
+    - string에서 bytes로 변환할 때 어떤 일이 발생하는 가? byte[ ]로 변환할 수 있는가?
+    - 얼마나 많은 비용이 드는가?
 
 2. mapping 들은 EVM에 의해 어떻게 저장되는가?
-- 왜 mapping을 지울수 없는가?
-- mapping의 mapping을 가지는 것은 어떻게 동작하는가?)
-- storage mapping은 있는데, 왜 memory mapping은 없는가?
+    - 왜 mapping을 지울수 없는가?
+    - mapping의 mapping을 가지는 것은 어떻게 동작하는가?)
+    - storage mapping은 있는데, 왜 memory mapping은 없는가?
 
 3. 컴파일된 contract은 EVM에서 어떻게 보이는가?
-- contract은 어떻게 생성되는가?
-- constructor는 무엇인가?
-- Fallback 함수는 무엇인가?
+    - contract은 어떻게 생성되는가?
+    - constructor는 무엇인가?
+    - Fallback 함수는 무엇인가?
 ```
 Ethereum VM(EVM) 에서 Solidity와 같은 고급 프로그래밍 언어가 어떻게 동작하는 지 배우는 것은 좋은 투자이다.
 
