@@ -1,6 +1,8 @@
 
 해당 글은 Howard님이 2017/08/06 에 작성한 [Diving Into The Ethereum Virtual Machine](https://blog.qtum.org/diving-into-the-ethereum-vm-6e8d5d2f3c30) 을 번역한 글입니다. 변역 과정에서 자연스러운 문장을 위해 다소 변경 부분이 존재할 수 있습니다. 
 
+* * * 
+
 ## Part1 - Introduction to the EVM Assembly Code
 
 Solidity는 고급 프로그래밍 언어로 많은 추상화를 제공한다. 그러나 이러한 추상화는 Solidity 관련 문서를 읽어봐도 프로그램이 동작하는 동안에 무슨일이 일어나는지 이해하기 어렵다. 예를 들면 아래와 같은 것들 말이다.
