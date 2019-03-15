@@ -1,5 +1,5 @@
 
-해당 글은 Howard님이 2017/08/06 에 작성한 [Diving Into The Ethereum Virtual Machine](https://blog.qtum.org/diving-into-the-ethereum-vm-6e8d5d2f3c30) 을 번역한 글입니다. 변역 과정에서 자연스러운 문장을 위해 다소 변경한 부분이 존재할 수 있습니다. 
+해당 글은 Howard님이 2017/08/06 에 작성한 [Diving Into The Ethereum Virtual Machine](https://blog.qtum.org/diving-into-the-ethereum-vm-6e8d5d2f3c30) 을 번역한 글입니다. 변역 과정에서 자연스러운 문장을 위해 다소 변경 부분이 존재할 수 있습니다. 
 
 ## Part1 - Introduction to the EVM Assembly Code
 
