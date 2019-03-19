@@ -249,3 +249,83 @@ tag_2:
   sstore
 ```
 
+
+### Array Bound Checking
+
+고정된 길이를 가지는 array는 변수를 가지는 struct와 storage 레이아웃은 동일하지만 생성된 어셈블리 코드는 다르다.
+그 이유는 Solidity가 array 접근을 위한 bound-checking 코드를 생성하기 때문이다.
+자~ 그럼 array를 가지는 contract를 최적화 옵션을 끈 상태에서 컴파일해보자.
+
+```
+$ solc --bin --asm c-static-array.sol
+```
+
+컴파일된 어셈블리 코드는 아래와 같으며, 각 명령어를 수행한 이후의 machine 상태를 출력하여 주석으로 작성해 보았다.
+
+```
+tag_2:
+  0xc0fefe
+    [0xc0fefe]
+  0x5
+    [0x5 0xc0fefe]
+  dup1
+  /* array bound checking code */
+  // 5 < 6
+  0x6
+    [0x6 0x5 0xc0fefe]
+  dup2
+    [0x5 0x6 0x5 0xc0fefe]
+  lt
+    [0x1 0x5 0xc0fefe]
+  // bound_check_ok = 1 (TRUE)
+  // if(bound_check_ok) { goto tag5 } else { invalid }
+  tag_5
+    [tag_5 0x1 0x5 0xc0fefe]
+  jumpi
+    // Test condition is true. Will goto tag_5.
+    // And `jumpi` consumes two items from stack.
+    [0x5 0xc0fefe]
+  invalid
+// Array access is valid. Do it.
+// stack: [0x5 0xc0fefe]
+tag_5:
+  sstore
+    []
+    storage: { 0x5 => 0xc0fefe }
+```
+
+우리는 위의 어셈블리 코드에서 bound-checking 코드를 확인할 수 있다. 만약, 컴파일러가 일부를 최적화하지만 완벽하지는 않은 것을 볼 수 있다.
+이제 우리는 array의 bound-checking가 어떻게 컴파일러의 최적화를 방해하여, 고정된 길이의 array이 변수나 struct 보다 효율적이지 않은지를 확인해 볼 것이다.
+
+
+### Packing Behaviour
+
+storage 사용에는 매우 비싼 비용이 든다.(이것은 백번 천번 말해 왔다)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
