@@ -101,7 +101,7 @@ tag_2:
   sstore
 ```
 
-위의 어셈블리 코드에서 보는 것과 같이 변수 선언 자체는 비용이 발생하지 않으며, 초기화 또한 필요하지 않다. 이처럼 Solidity는 변수를 위한 storage position을 준비하고, 그 storage position을 접근(사용)할 때만 비용(gas)을 지불하면 된다. 위의 예제의 경우 우리는 f 를 storage position "0x5"에 저장하기 위한 비용만 지불하면 된다.
+위의 어셈블리 코드에서 보는 것과 같이 Store variables 선언 자체는 비용이 발생하지 않으며, 초기화 또한 필요하지 않다. 이처럼 Solidity는 변수를 위한 storage position을 준비하고, 그 storage position을 접근(사용)할 때만 비용(gas)을 지불하면 된다. 위의 예제의 경우 우리는 f 를 storage position "0x5"에 저장하기 위한 비용만 지불하면 된다.
 만약, 직접 어셈블리 코드를 작성하는 경우 더 이상의 storage 확장 없이 어떤 storage postion에 저장할 지 선택할 수 있다.
 
 ### Reading Zero
@@ -205,7 +205,7 @@ contract C {
 }
 ```
 
-컴파일러는 정확하게 얼만큼의 uint256(32 bytes)가 있는지 알기 때문에, 변수 및 구조체와 같은 배열의 요소를 하나씩 차례대로 배치할 수 있다.
+컴파일러는 정확하게 얼만큼의 uint256(32 bytes)가 있는지 알기 때문에, Store variables 및 구조체와 같은 배열의 요소를 하나씩 차례대로 배치할 수 있다.
 위의 예제에서 우리는 stroage position "0x5"에 데이터를 저장하였고 이를 컴파일하여 어셈블리 코드로 확인해보자.
 
 ```
@@ -252,7 +252,7 @@ tag_2:
 
 ### Array Bound Checking
 
-고정된 길이를 가지는 array는 변수를 가지는 struct와 storage 레이아웃은 동일하지만 생성된 어셈블리 코드는 다르다.
+고정된 길이를 가지는 array는 Store variables를 가지는 struct와 storage 레이아웃은 동일하지만 생성된 어셈블리 코드는 다르다.
 그 이유는 Solidity가 array 접근을 위한 bound-checking 코드를 생성하기 때문이다.
 자~ 그럼 array를 가지는 contract를 최적화 옵션을 끈 상태에서 컴파일해보자.
 
@@ -295,7 +295,7 @@ tag_5:
 ```
 
 우리는 위의 어셈블리 코드에서 bound-checking 코드를 확인할 수 있다. 만약, 컴파일러가 일부를 최적화하지만 완벽하지는 않은 것을 볼 수 있다.
-이제 우리는 array의 bound-checking가 어떻게 컴파일러의 최적화를 방해하여, 고정된 길이의 array이 변수나 struct 보다 효율적이지 않은지를 확인해 볼 것이다.
+이제 우리는 array의 bound-checking가 어떻게 컴파일러의 최적화를 방해하여, 고정된 길이의 array이 store variables나 struct 보다 효율적이지 않은지를 확인해 볼 것이다.
 
 
 ### Packing Behaviour
@@ -303,7 +303,7 @@ tag_5:
 storage 사용에는 매우 비싼 비용이 든다.(이것은 백번 천번 말해 왔다)
 이 때문에 최적화의 한 가지 핵심은 32bytes 크기의 storage slot에 최대한 많은 데이터를 압축하여 넣는 것이다.
 
-각 64bits를 가지는 4개의 변수를 통해 256 bits (32bytes)를 추가한 constract를 살펴보자.
+각 64bits를 가지는 4개의 store variables를 통해 256 bits (32bytes)를 추가한 constract를 살펴보자.
 
 ```
 pragma solidity ^0.4.11;
@@ -367,7 +367,7 @@ tag_2:
 
 ### Breaking The Optimizer
 
-최적화기가 항상 잘 동작할 수 있다면, 그만하자. 우리가 할 수 있는 유일한 변화는 helper 함수를 이용하여 변수를 설정하는 것뿐이다.
+최적화기가 항상 잘 동작할 수 있다면, 그만하자. 우리가 할 수 있는 유일한 변화는 helper 함수를 이용하여 store variables를 설정하는 것뿐이다.
 
 ```
 pragma solidity ^0.4.11;
@@ -499,7 +499,7 @@ $ solc --bin --asm --optimize c-static-array--packing.sol | grep -E '(sstore|slo
   sstore
 ```
 
-위의 "sstore", "sload"의 명령어 수(각각 4개씩 존재)를 보면 고정된 길이의 array가 struct 또는 변수들과 동일한 storage 레이아웃을 가지지만 최적화는 실패하였다.
+위의 "sstore", "sload"의 명령어 수(각각 4개씩 존재)를 보면 고정된 길이의 array가 struct 또는 store variables과 동일한 storage 레이아웃을 가지지만 최적화는 실패하였다.
 
 어셈블리 코드를 간략하게 살펴보면 각 array access가 bound-checking 코드를가지고 있으며, 각각 다른 tag에 존재한다. 그러나 tag의 경계가 최적화를 깨버렸다.
 
@@ -511,14 +511,15 @@ $ solc --bin --asm --optimize c-static-array--packing.sol | grep -E '(sstore|slo
 
 ### Conclusion
 
-만약,Solidity 컴파일러는
+Solidity 컴파일러가 store variables의 크기를 파악할 수 있다면 storage에 차례로 저장한다. 그리고 가능한 데이터를 32bytes로 packing 한다.
 
+요약하자면 packing의 동작은 아래와 같이 정리할 수 있다.
 
+    - Store variables  : YES
+    - Struct field : YES
+    - Fixed-length arrays : No, 이론상으론 YES
 
+storage를 사용하는 것은 비용이 많이 들기 때문에 데이터베이스 스키마를 구상할 때 store variables를 잘 생각해야한다.
+contract를 작성할 때, 작은 단위로 코드를 작성하고 어셈블리 코드를 확인하여 컴파일러가 올바르게 최적화하였는지 확인하는 것도 유용하다.
 
-
-
-
-
-
-
+우리는 Solidity 컴파일러가 앞으로 더 향상될 것이라 확신할 수 있다. 하지만 지금은 맹목적으로 최적화기를 신뢰할 수 없다.
