@@ -34,4 +34,81 @@ sstore(0x0, 0x1)
 
 ### Parsecs Upon Parsecs of Tape
 
+Parsecs Upon Parsecs of Tape 에서는 EVM의 동작을 Universal Turing Machine에 비유하여 설명할 것이다.
+
 ![Alt text](./images/TuringMachine.jpg "Turing Machine. Source : http://raganwald.com/")
+Turing Machine. Source : http://raganwald.com/
+
+Universal Turing Machine을 구축하기 위해서는 아래와 같은 두 가지 필수요소가 존재한다.
+
+    - 점프 또는 재귀를 반복하는 방법(jump or recursion, loop)
+    - 무한한 메모리
+
+EVM 어셈블리 코드는 점프, 그리고 EVM storage가 제공하는 무한한 메모리를 가지며 이것으로 이더리움을 시뮬레이팅하기에 충분하다.
+
+![Alt text](./images/DIvingIntoTheMicroverseBattery.gif "DIving Into The Microverse Battery")
+Diving Into The Microverse Battery
+
+contract를 위한 EVM storage는 Turing Machine의 무한한 종이 테이프와 같으며, 아래와 같이 테이프의 각 슬롯은 32 bytes를 가진다.
+
+```
+[32 bytes][32 bytes][32 bytes]...
+```
+
+이제 무한한 테이프(즉, 무한한 storage) 에서 데이터가 어떻게 존재하는지 확인할 것이다.
+contract 당 테이프의 길이는 2^256^ 또는 10^77^ storage 슬롯을 가진다.
+
+### The Blank Tape
+
+storage는 최초에 모두 "0"으로 채워져있다. "0"으로 채워져 있는 경우 어떠한 비용(gas)도 발생하지 않는다. 왜 그런지 "0"(zero-value)가 동작하는 간단한 contract를 살펴보자.
+
+```
+pragma solidity ^0.4.11;
+contract C {
+    uint256 a;
+    uint256 b;          uint256 c;
+    uint256 d;
+    uint256 e;
+    uint256 f;
+    function C() {
+      f = 0xc0fefe;
+    }
+}
+```
+
+위의 contract는 아래와 같이 간단한 storage 레이아웃을 가진다.
+
+    - a는 storage "0x0"
+    - b는 storage "0x1"
+    - c는 storage "0x2"
+    - d는 storage "0x3"
+    - e는 storage "0x4"
+    - f는 storage "0x5"
+
+위의 contract에서 살펴볼 핵심내용은 **"만약 우리가 f를 사용했을 때, 사용하지 않는 'a,b,c,d,e'를 위해 얼마의 비용을 지불해야 하는가?"** 이다.
+자! 이제 위의 contract를 컴파일 해보자.
+
+```
+$ solc --bin --asm --optimize c-many-variables.sol
+```
+
+컴파일된 어셈블리 코드의 핵심은 아래와 같다.
+
+```
+// sstore(0x5, 0xc0fefe)
+tag_2:
+  0xc0fefe
+  0x5
+  sstore
+```
+
+위의 어셈블리 코드에서 보는 것과 같이 변수 선언 자체는 비용이 발생하지 않으며, 초기화 또한 필요하지 않다.
+이처럼 Solidity는 변수를 위한 storage position을 준비하고, 그 storage position을 접근(사용)할 때만 비용(gas)을 지불하면 된다.
+위의 예제의 경우 우리는 f 를 storage position "0x5"에 저장하기 위한 비용만 지불하면 된다.
+만약, 직접 어셈블리 코드를 작성하는 경우 더 이상의 storage 확장 없이 어떤 storage postion에 저장할 지 선택할 수 있다.
+
+### Reading Zero
+
+
+
+
