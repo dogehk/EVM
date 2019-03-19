@@ -46,7 +46,7 @@ Universal Turing Machine을 구축하기 위해서는 아래와 같은 두 가�
 EVM 어셈블리 코드는 점프, 그리고 EVM storage가 제공하는 무한한 메모리를 가지며 이것으로 이더리움을 시뮬레이팅하기에 충분하다.
 
 <img src="./images/DIvingIntoTheMicroverseBattery.gif" alt="Diving Into The Microverse Battery
-" style="align-content: center">Diving Into The Microverse Battery </img>
+" style="align-content: center"><br>Diving Into The Microverse Battery </img>
 
 contract를 위한 EVM storage는 Turing Machine의 무한한 종이 테이프와 같으며, 아래와 같이 테이프의 각 슬롯은 32 bytes를 가진다.
 
