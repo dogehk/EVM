@@ -36,8 +36,7 @@ sstore(0x0, 0x1)
 
 Parsecs Upon Parsecs of Tape 에서는 EVM의 동작을 Universal Turing Machine에 비유하여 설명할 것이다.
 
-![Alt text](./images/TuringMachine.jpg "Turing Machine. Source : http://raganwald.com/")
-Turing Machine. Source : http://raganwald.com/
+<img src="./images/TuringMachine.jpg" alt="Turing Machine. Source : http://raganwald.com/" style="align-content: center"> Turing Machine. Source : http://raganwald.com/ </img>
 
 Universal Turing Machine을 구축하기 위해서는 아래와 같은 두 가지 필수요소가 존재한다.
 
@@ -46,8 +45,8 @@ Universal Turing Machine을 구축하기 위해서는 아래와 같은 두 가�
 
 EVM 어셈블리 코드는 점프, 그리고 EVM storage가 제공하는 무한한 메모리를 가지며 이것으로 이더리움을 시뮬레이팅하기에 충분하다.
 
-![Alt text](./images/DIvingIntoTheMicroverseBattery.gif "DIving Into The Microverse Battery")
-Diving Into The Microverse Battery
+<img src="./images/DIvingIntoTheMicroverseBattery.gif" alt="Diving Into The Microverse Battery
+" style="align-content: center">Diving Into The Microverse Battery </img>
 
 contract를 위한 EVM storage는 Turing Machine의 무한한 종이 테이프와 같으며, 아래와 같이 테이프의 각 슬롯은 32 bytes를 가진다.
 
@@ -56,7 +55,7 @@ contract를 위한 EVM storage는 Turing Machine의 무한한 종이 테이프�
 ```
 
 이제 무한한 테이프(즉, 무한한 storage) 에서 데이터가 어떻게 존재하는지 확인할 것이다.
-contract 당 테이프의 길이는 2^256^ 또는 10^77^ storage 슬롯을 가진다.
+contract 당 테이프의 길이는 2<sup>256</sup> 또는 10<sup>77</sup> storage 슬롯을 가진다.
 
 ### The Blank Tape
 
