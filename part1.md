@@ -1,7 +1,7 @@
 
-해당 글은 Howard님이 2017/08/06 에 작성한 [Diving Into The Ethereum Virtual Machine](https://blog.qtum.org/diving-into-the-ethereum-vm-6e8d5d2f3c30) 을 번역한 글입니다. 변역 과정에서 자연스러운 문장을 위해 다소 변경 부분이 존재할 수 있습니다. 
+해당 글은 Howard님이 2017/08/06 에 작성한 [Diving Into The Ethereum Virtual Machine](https://blog.qtum.org/diving-into-the-ethereum-vm-6e8d5d2f3c30) 을 번역한 글입니다. 변역 과정에서 자연스러운 문장을 위해 다소 변경된 부분이 존재할 수 있습니다.
 
-* * * 
+* * *
 
 ## Part1 - Introduction to the EVM Assembly Code
 
@@ -32,7 +32,7 @@ Ethereum VM(EVM) 에서 Solidity와 같은 고급 프로그래밍 언어가 어�
 - EVM은 programming language design, data structure, cryptography의 교차점에서 놀기 좋은 이유를 제공할 것이다.
 ```
 
-EVM bytecode가 어떻게 동작하는 지 이해하기 위해서 간단한 Solidity contract 를 이용해 아래와 같은 내용들을 확인할 것이다.  
+EVM bytecode가 어떻게 동작하는 지 이해하기 위해서 간단한 Solidity contract 를 이용해 아래와 같은 내용들을 확인할 것이다.
 
 ```
 - EVM bytecode의 기초
@@ -115,7 +115,7 @@ Binary:
 
 ### In Baby Steps
 
-위에서 생성된 어셈블리 코드의 절반은 일반적인 Solidity 프로그램들에서 동일하게 사용되는 구문이다. 해당 구문은 나중에 살펴보고 지금은 아래의 코드와 같이 우리의 contract에 한정된 부분만 확인할 것이다. 
+위에서 생성된 어셈블리 코드의 절반은 일반적인 Solidity 프로그램들에서 동일하게 사용되는 구문이다. 해당 구문은 나중에 살펴보고 지금은 아래의 코드와 같이 우리의 contract에 한정된 부분만 확인할 것이다.
 
 ```
 a = 1
@@ -132,7 +132,7 @@ a = 1
 50
 ```
 
-EVM은 기본적으로 top-down 형태로 각 명령어를 실행한다. 
+EVM은 기본적으로 top-down 형태로 각 명령어를 실행한다.
 자! 이제 bytecode와 어셈블리 코드가 어떻게 연관되어 있는지 확인하기 위해 “tag_2”의 어셈블리 코드에 bytecode를 주석을 달아보자. (어셈블리 코드와 bytecode에 대한 테이블은 https://ethervm.io 를 참고하면 된다.)
 
 ```
@@ -140,7 +140,7 @@ tag_2:
   // 60 01
   0x1
   // 60 00
-  0x0  
+  0x0
   // 81
   dup2
   // 90
@@ -156,8 +156,8 @@ tag_2:
 
 ### Simulating The EVM
 
-EVM은 stack machine 이다. 명령어들은 stack 에 있는 arguments 등과 같은 값을 사용하고, 그 결과들을 stack에 push 한다. “add”의 동작에 대해 생각해보자. 
-예를 들어 stack에 아래와 같은 두 개의 값이 있다. 
+EVM은 stack machine 이다. 명령어들은 stack 에 있는 arguments 등과 같은 값을 사용하고, 그 결과들을 stack에 push 한다. “add”의 동작에 대해 생각해보자.
+예를 들어 stack에 아래와 같은 두 개의 값이 있다.
 
 ```[1 2]```
 
@@ -272,7 +272,7 @@ tag_2:
   pop
   // a = 1
   sstore(0x0, 0x1)
-  // b = 2 
+  // b = 2
   sstore(0x1, 0x2)
 ```
 
@@ -281,7 +281,7 @@ pseudocode 에서의 어셈블리 코드는 아래와 같다.
 ```
  // a = 1
   sstore(0x0, 0x1)
-  // b = 2 
+  // b = 2
   sstore(0x1, 0x2)
 ```
 
@@ -318,7 +318,7 @@ tag_2:
   // a = 1
   0x1
   0x0
-  dup1 
+  dup1
     0x100
   exp
   dup2
@@ -326,7 +326,7 @@ tag_2:
   dup2
   0xffffffffffffffffffffffffffffffff
   mul
-  not 
+  not
   and
   swap1
   dup4
@@ -496,12 +496,12 @@ tag_2:
 - sub(exp(0x2, 0x80), 0x1)
 ```
 // Bitmask for the lower 16 bytes
-16:32 0x00000000000000000000000000000000 
+16:32 0x00000000000000000000000000000000
 00:16 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 ```
 코드는 이 값을 사용하여 “bits-shuffling”을 하여 원하는 결과에 도달한다.
 ```
-16:32 0x00000000000000000000000000000002 
+16:32 0x00000000000000000000000000000002
 00:16 0x00000000000000000000000000000001
 ```
 
@@ -530,10 +530,10 @@ tag_2:
 
 ### Summary
 
-EVM 컴파일러는 bytecode 크기, 속도, 메모리를 효과적으로 사용하기 위한 최적화가 존재하지 않지만 gas 사용량을 최적화하며 이것은 Ehtereum 블록체인이 효율적으로 수행할 수 있는 계산을 인센티브로 하는 간접 계층이다. 
+EVM 컴파일러는 bytecode 크기, 속도, 메모리를 효과적으로 사용하기 위한 최적화가 존재하지 않지만 gas 사용량을 최적화하며 이것은 Ehtereum 블록체인이 효율적으로 수행할 수 있는 계산을 인센티브로 하는 간접 계층이다.
 
 - **EVM은 256 bit machine** 이다. 32bytes 단위로 데이터를 조작하는 것이 가장 자연스럽다.
 - 영구 저장장치는 상당히 비싸다. (gas가 많이 든다)
 - **Solidity 컴파일러는 gas 사용량을 최소화**하기 위해 흥미로운 선택을 한다.
 
-Gas 비용은 다소 자의적으로 설정되어 있으며, 향후에 변경될 수 있다. 비용 변화에 따라, 컴파일러들 또한 다른 선택을 할것이다. 
+Gas 비용은 다소 자의적으로 설정되어 있으며, 향후에 변경될 수 있다. 비용 변화에 따라, 컴파일러들 또한 다른 선택을 할것이다.
