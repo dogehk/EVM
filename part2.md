@@ -193,4 +193,59 @@ tag_2:
 
 ### Fixed Length Array
 
+이번엔 아래의 contract 예제를 통해 고정된 길이의 array 타입에 대해 살펴보자.
+
+```
+pragma solidity ^0.4.11;
+contract C {
+    uint256[6] numbers;
+    function C() {
+      numbers[5] = 0xC0FEFE;
+    }
+}
+```
+
+컴파일러는 정확하게 얼만큼의 uint256(32 bytes)가 있는지 알기 때문에, 변수 및 구조체와 같은 배열의 요소를 하나씩 차례대로 배치할 수 있다.
+위의 예제에서 우리는 stroage position "0x5"에 데이터를 저장하였고 이를 컴파일하여 어셈블리 코드로 확인해보자.
+
+```
+$ solc --bin --asm --optimize c-static-array.sol
+```
+
+```
+tag_2:
+  0xc0fefe
+  0x0
+  0x5
+tag_4:
+  add
+  0x0
+tag_5:
+  pop
+  sstore
+```
+
+어셈블리 코드가 조금 길어보이지만 자세히 살펴보면 앞선 예제와 동일하다. 위의 어셈블리 코드를 직접 최적화해보자.
+
+```
+tag_2:
+  0xc0fefe
+  // 0+5. Replace with 0x5
+  0x0
+  0x5
+  add
+  // Push then pop immediately. Useless, just remove.
+  0x0
+  pop
+  sstore
+```
+
+태그와 의사 명령어를 제거하면, 결국에는 앞선 예제와 동일한 bytecode 시퀀스가 된다.
+
+```
+tag_2:
+  0xc0fefe
+  0x5
+  sstore
+```
 
