@@ -101,13 +101,96 @@ tag_2:
   sstore
 ```
 
-위의 어셈블리 코드에서 보는 것과 같이 변수 선언 자체는 비용이 발생하지 않으며, 초기화 또한 필요하지 않다.
-이처럼 Solidity는 변수를 위한 storage position을 준비하고, 그 storage position을 접근(사용)할 때만 비용(gas)을 지불하면 된다.
-위의 예제의 경우 우리는 f 를 storage position "0x5"에 저장하기 위한 비용만 지불하면 된다.
+위의 어셈블리 코드에서 보는 것과 같이 변수 선언 자체는 비용이 발생하지 않으며, 초기화 또한 필요하지 않다. 이처럼 Solidity는 변수를 위한 storage position을 준비하고, 그 storage position을 접근(사용)할 때만 비용(gas)을 지불하면 된다. 위의 예제의 경우 우리는 f 를 storage position "0x5"에 저장하기 위한 비용만 지불하면 된다.
 만약, 직접 어셈블리 코드를 작성하는 경우 더 이상의 storage 확장 없이 어떤 storage postion에 저장할 지 선택할 수 있다.
 
 ### Reading Zero
 
+storage 안의 position들은 언제든 쓰고(저장), 읽을 수(로드) 있으며, zero-value를 읽을 경우(초기화되지 않은 position)에는 "0x0"이 리턴된다.
+아래는 초기화되지 않은 position을 읽는 contract 예제이다.
 
+```
+pragma solidity ^0.4.11;
+contract C {
+    uint256 a;
+    function C() {
+      a = a + 1;
+    }
+}
+```
+
+자! 위의 예제를 컴파일 해보자.
+
+```
+$ solc --bin --asm --optimize c-zero-value.sol
+```
+
+컴파일된 어셈블리 코드는 아래와 같다.
+
+```
+tag_2:
+  // sload(0x0) returning 0x0
+  0x0
+  dup1
+  sload
+  // a + 1; where a == 0
+  0x1
+  add
+  // sstore(0x0, a + 1)
+  swap1
+  sstore
+```
+
+위의 어셈블리 코드에서 확인할 수 있듯이 초기화되지 않은 storage position에서 데이터를 로드하는 코드("sload")가 유효하다. 그러나 우리는 Solidity 컴파일러보다 똑똑하기 때문에 "tag_2"가 생성자이고, a가 쓰여지지 않았다라는 것을 알고 "sload" 명령어를 "0x0"으로 대체하여 gas를 절약할 수 있다.
+
+
+### Representing Struct
+
+자~ 이제 본격적으로 struct type에 대해 살펴보자.
+아래와 같이 6개의 필드를 가지는 복잡한 struct 타입이 존재하는 contract를 예로 들어보자.
+
+```
+pragma solidity ^0.4.11;
+contract C {
+    struct Tuple {
+      uint256 a;
+      uint256 b;
+      uint256 c;
+      uint256 d;
+      uint256 e;
+      uint256 f;
+    }
+
+    Tuple t;
+    function C() {
+      t.f = 0xC0FEFE;
+    }
+}
+```
+
+위의 예제와 같은 contract의 storage 레이아웃은 아래와 같다.
+
+    - t.a는 storage "0x0"
+    - t.b는 storage "0x1"
+    - t.c는 storage "0x2"
+    - t.d는 storage "0x3"
+    - t.e는 storage "0x4"
+    - t.f는 storage "0x5"
+
+앞선 contract 예제와 같이 우리는 초기화를 위한 비용을 지불하지 않고 t.f에 직접 데이터를 쓸 수 있다.
+이를 직접 컴파일하여 어셈블리 코드를 확인해보자.
+
+```
+$ solc --bin --asm --optimize c-struct-fields.sol
+```
+
+```
+tag_2:
+  0xc0fefe
+  0x5
+  sstore
+```
+
+### Fixed Length Array
 
 
