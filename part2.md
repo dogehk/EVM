@@ -367,12 +367,80 @@ tag_2:
 
 ### Breaking The Optimizer
 
-만약
+최적화기가 항상 잘 동작할 수 있다면, 그만하자. 우리가 할 수 있는 유일한 변화는 helper 함수를 이용하여 변수를 설정하는 것뿐이다.
+
+```
+pragma solidity ^0.4.11;
+contract C {
+    uint64 a;
+    uint64 b;
+    uint64 c;
+    uint64 d;
+    function C() {
+      setAB();
+      setCD();
+    }
+    function setAB() internal {
+      a = 0xaaaa;
+      b = 0xbbbb;
+    }
+    function setCD() internal {
+      c = 0xcccc;
+      d = 0xdddd;
+    }
+}
+```
+
+```
+$ solc --bin --asm --optimize c-many-variables--packing-helpers.sol
+```
+
+위의 contract를 컴파일한 어셈블리 코드는 너무 길기 때문에 우리는 상세한 부분은 무시하고 구조적인 부분에 초점을 맞출 것이다.
+
+```
+// Constructor function
+tag_2:
+  // ...
+  // call setAB() by jumping to tag_5
+  jump
+tag_4:
+  // ...
+  // call setCD() by jumping to tag_7
+  jump
+// function setAB()
+tag_5:
+  // Bit-shuffle and set a, b
+  // ...
+  sstore
+tag_9:
+  jump  // return to caller of setAB()
+// function setCD()
+tag_7:
+  // Bit-shuffle and set c, d
+  // ...
+  sstore
+tag_10:
+  jump  // return to caller of setCD()
+```
+
+위의 어셈블리 코드를 보면, 하나의 "sstore"가 아닌 두 개의 "sstore"가 사용되었다. 이는 Solidity 컴파일러는 tag 내부를 최적화할 수 있으나, tag들을 교차하여 최적화할 수 없기 때문이다.
+
+함수 호출은 많은 비용이 들고, "sstore" 최적화에 실패하였기 때문에 함수를 호출하는 것은 비용이 많이 든다.
+
+이 문제를 해결하기 위해, Solidity 컴파일러는 함수를 호출하지 않는 것과 동일한 코드를 얻을 수 있도록 함수들을 어떻게 inline화 할지 학습이 필요하다.
+
+```
+a = 0xaaaa;
+b = 0xbbbb;
+c = 0xcccc;
+d = 0xdddd;
+```
+
+완성된 어셈블리 코드를 보면 setAB()와 setCD()함수에 "sstore" 명령어가 두 번 포함되어 코드 크기가 커지고, contract 동작에 추가 비용이 들게됩니다.
+다음번에는 contract lifecycle에 대해 확인할 때 조금더 자세히 설명할 것이다.
 
 
-
-
-
+### Why The Optimizer Breaks
 
 
 
