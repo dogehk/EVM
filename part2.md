@@ -301,12 +301,73 @@ tag_5:
 ### Packing Behaviour
 
 storage 사용에는 매우 비싼 비용이 든다.(이것은 백번 천번 말해 왔다)
+이 때문에 최적화의 한 가지 핵심은 32bytes 크기의 storage slot에 최대한 많은 데이터를 압축하여 넣는 것이다.
+
+각 64bits를 가지는 4개의 변수를 통해 256 bits (32bytes)를 추가한 constract를 살펴보자.
+
+```
+pragma solidity ^0.4.11;
+contract C {
+    uint64 a;
+    uint64 b;
+    uint64 c;
+    uint64 d;
+    function C() {
+      a = 0xaaaa;
+      b = 0xbbbb;
+      c = 0xcccc;
+      d = 0xdddd;
+    }
+}
+```
+
+우리는 컴파일러가 하나의 "sstore"을 이용해서 동일한 storage slot에 4개의 변수를 저장하기를 기대할 것이다.
+실제 그러한지 확인해보자.
+
+```
+$ solc --bin --asm --optimize c-many-variables--packing.sol
+```
+
+```
+tag_2:
+    /* "c-many-variables--packing.sol":121:122  a */
+  0x0
+    /* "c-many-variables--packing.sol":121:131  a = 0xaaaa */
+  dup1
+  sload
+    /* "c-many-variables--packing.sol":125:131  0xaaaa */
+  0xaaaa
+  not(0xffffffffffffffff)
+    /* "c-many-variables--packing.sol":121:131  a = 0xaaaa */
+  swap1
+  swap2
+  and
+  or
+  not(sub(exp(0x2, 0x80), exp(0x2, 0x40)))
+    /* "c-many-variables--packing.sol":139:149  b = 0xbbbb */
+  and
+  0xbbbb0000000000000000
+  or
+  not(sub(exp(0x2, 0xc0), exp(0x2, 0x80)))
+    /* "c-many-variables--packing.sol":157:167  c = 0xcccc */
+  and
+  0xcccc00000000000000000000000000000000
+  or
+  sub(exp(0x2, 0xc0), 0x1)
+    /* "c-many-variables--packing.sol":175:185  d = 0xdddd */
+  and
+  0xdddd000000000000000000000000000000000000000000000000
+  or
+  swap1
+  sstore
+```
+
+이해할 수 없는 bit-shuffling는 무시하고, **"sstore"이 하나만 사용되었으며 최적화에 성공했다.**
 
 
+### Breaking The Optimizer
 
-
-
-
+만약
 
 
 
