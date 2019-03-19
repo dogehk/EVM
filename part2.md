@@ -442,12 +442,76 @@ d = 0xdddd;
 
 ### Why The Optimizer Breaks
 
+최적화기는 tag들을 교차하여 최적화하지 않는다. "1+1" 수행하는 contract의 최적화 성공/실패에 대한 어셈블리 코드를 살펴 보자.
+
+```
+// Optimize OK!
+tag_0:
+  0x1
+  0x1
+  add
+  ...
+```
+
+```
+// Optimize Fail!
+tag_0:
+  0x1
+  0x1
+tag_1:
+  add
+  ...
+```
+
+위의 최적화 동작은 Solidity version 0.4.13 에서 추가됬다.
 
 
+### Breaking The Optimizer, Again
+
+다른 방법으로 최적화기가 실패한 것을 살펴보자. 고정된 길이의 array를 위해 packing이 동작하는가?
+아래의 contract를 보자.
+
+```
+pragma solidity ^0.4.11;
+contract C {
+    uint64[4] numbers;
+    function C() {
+      numbers[0] = 0x0;
+      numbers[1] = 0x1111;
+      numbers[2] = 0x2222;
+      numbers[3] = 0x3333;
+    }
+}
+```
+
+다시 말하지만 우리는 정확하게 하나의 "sstore" 명령어를 사용하기 위해, 4개의 64bits 변수를 32bytes storage slot에 packing하기를 원한다.
+위의 contract를 컴파일한 어셈블리 코드는 너무 길기 때문에 어셈블리 코드 내의 "sstore", "sload" 명령어의 수만 확인하자.
+
+```
+$ solc --bin --asm --optimize c-static-array--packing.sol | grep -E '(sstore|sload)'
+  sload
+  sstore
+  sload
+  sstore
+  sload
+  sstore
+  sload
+  sstore
+```
+
+위의 "sstore", "sload"의 명령어 수(각각 4개씩 존재)를 보면 고정된 길이의 array가 struct 또는 변수들과 동일한 storage 레이아웃을 가지지만 최적화는 실패하였다.
+
+어셈블리 코드를 간략하게 살펴보면 각 array access가 bound-checking 코드를가지고 있으며, 각각 다른 tag에 존재한다. 그러나 tag의 경계가 최적화를 깨버렸다.
+
+한 가지 다행인 점은 아래와 같은 이유로 3개의 "sstore" 명령어는 첫 번째 "sstore" 명령어보다 비용이 적게 든다.
+
+    - "sstore"는 새로운 storage position에 데이터를 쓸 때, 20000 gas
+    - 이미 존재하는 storage position에 데이터를 쓸때, 5000 gas
 
 
+### Conclusion
 
-
+만약,Solidity 컴파일러는
 
 
 
