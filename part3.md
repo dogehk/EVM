@@ -110,7 +110,7 @@ b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x
 이제 우리는 ```0x798...187c``` 를 계산할 수 있다.
 
 store variable ```items```의 store position은 ```"0x0"```이다. (```items```이 첫 번째 store variable 일 때)
-주소를 얻기 위해서 key ```0xc0fefe```와 ```items```의 position ```"0x0"을 아래와 같이 조합하자.
+이제 key의 저장 주소를 얻기 위해서 key ```0xc0fefe```와 ```items```의 position ```"0x0"```을 아래와 같이 조합하자.
 
 ```
 # key = 0xC0FEFE, position = 0
@@ -118,12 +118,63 @@ store variable ```items```의 store position은 ```"0x0"```이다. (```items```�
 '79826054ee948a209ff4a6c9064d7398508d2c1909a392f899d301c6d232187c'
 ```
 
-이렇게 hash된 key를 구할 수 있으며 이를 공식화하면 아래와 같이 키의 저장 주소를 구하기 위한 계산 공식이 만들어진다.
+이렇게 hash된 key를 구할 수 있으며 이를 공식화하면 아래와 같이 key의 저장 주소를 구하기 위한 계산 공식이 만들어진다.
 
 ```
 keccak256(bytes32(key) + bytes32(position))
 ```
 
-
 ### Two Mappings
 
+자! 이제 우리는 key의 저장 주소를 구하는 공식을 가지고 실제 key의 저장 주소를 구할 수 있는 지 이는 아래의 예제를 통해 확인해보자. 
+
+```
+pragma solidity ^0.4.11;
+
+contract C {
+    mapping(uint256 => uint256) itemsA;
+    mapping(uint256 => uint256) itemsB;
+
+    function C() {
+      itemsA[0xAAAA] = 0xAAAA;
+      itemsB[0xBBBB] = 0xBBBB;
+    }
+}
+```
+
+위의 contract 코드에서 ```itemsA```의 position은```0``` , key는 ```0xAAAA``` 이다.
+
+```
+# key = 0xAAAA, position = 0
+>>> keccak256(bytes32(0xAAAA) + bytes32(0))
+'839613f731613c3a2f728362760f939c8004b5d9066154aab51d6dadf74733f3'
+```
+
+마찬가지로 ```itemsB```의 position은 ```1```, key는 ```0xBBBB``` 이다. 
+
+```
+# key = 0xBBBB, position = 1
+>>> keccak256(bytes32(0xBBBB) + bytes32(1))
+'34cb23340a4263c995af18b23d9f53b67ff379ccaa3a91b75007b010c489d395'
+```
+
+위의 계산 결과를 확인하기 위해 실제 컴파일 해보자.
+
+```
+$ solc --bin --asm --optimize  c-mapping-2.sol
+```
+
+```
+tag_2:
+  // ... Omit memory operations that could be optimized away
+  0xaaaa
+  0x839613f731613c3a2f728362760f939c8004b5d9066154aab51d6dadf74733f3
+  sstore
+  0xbbbb
+  0x34cb23340a4263c995af18b23d9f53b67ff379ccaa3a91b75007b010c489d395
+  sstore
+```
+
+예상대로 동일한 key의 저장 주소가 나왔다. 
+
+### KECCAK256 in Assembly
